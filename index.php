@@ -13,7 +13,7 @@ require 'vendor/autoload.php';
 use League\Csv\Reader;
 $income= 0.00886247;
 $gpus=5;
-$payday = "06/10/2021";
+$payday = "08/10/2021";
 $payDayFormat = DateTime::createFromFormat('d/m/Y',$payday);
 $contractDateEnd = date('Y-m-d', strtotime($payDayFormat->format('Y-m-d')));
 $payDayFormat->modify('-2 day');
@@ -44,7 +44,7 @@ if (isset($_POST['submit']) && $gpus >= 1) {
             }
         }
         if($daycont != 0) {
-            print "Average Unit " . $j . " ethash H/s: " . $sum / $zerocont . ' H/s Downtime: '.gmdate("H:i:s", (60*5)*($dead)).'<br>';
+            print "Average Unit " . $j . " ethash H/s: " . $sum / $zerocont . ' H/s, Downtime: '.gmdate("H:i:s", (60*5)*($dead)).'<br>';
             $sumavg=$sumavg + ($sum / $zerocont);
             array_push($prom,$sum / $zerocont);
         }
@@ -65,7 +65,7 @@ if (isset($_POST['submit']) && $gpus >= 1) {
     }
 
     print '<br>';
-    
+
     print '<br> Start date: '.$contractDateBegin;
     print '<br>End date: '.$contractDateEnd;
 } else {
