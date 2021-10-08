@@ -37,14 +37,11 @@ if (isset($_POST['submit']) && $gpus >= 1) {
             if ((date('Y-m-d', strtotime($hashtime->format('Y-m-d'))) >= $contractDateBegin) && (date('Y-m-d', strtotime($hashtime->format('Y-m-d'))) < $contractDateEnd)) {
                 $daycont++;
                 $sum = $sum + $obj[$i]->{'Unit '.$j.' ethash H/s'};
-                //echo "YES GO! " . $hashtime->format('Y-m-d') . '<br>';
                 if ($obj[$i]->{'Unit '.$j.' ethash H/s'} != 0)
                     $zerocont++;
                 else
                     $dead++;
-            } /*else {
-                echo "NO GO! " . $hashtime->format('Y-m-d') . '<br>';
-            }*/
+            }
         }
         if($daycont != 0) {
             print "Average Unit " . $j . " ethash H/s: " . $sum / $zerocont . ' H/s Downtime: '.gmdate("H:i:s", (60*5)*($dead)).'<br>';
@@ -59,8 +56,6 @@ if (isset($_POST['submit']) && $gpus >= 1) {
         $dead=0;
     }
 
-    //print $sum/$zerocont;
-    //print '<br>'.$zerocont;
     print '<br>Income: '.$income.' eth<br>';
     print '<br>Total Avg: '.$sumavg.' H/s<br>';
     print '<br>';
@@ -70,9 +65,7 @@ if (isset($_POST['submit']) && $gpus >= 1) {
     }
 
     print '<br>';
-    //print_r($prom);
-
-
+    
     print '<br> Start date: '.$contractDateBegin;
     print '<br>End date: '.$contractDateEnd;
 } else {
