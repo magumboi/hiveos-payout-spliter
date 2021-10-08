@@ -2,15 +2,15 @@
 <form enctype='multipart/form-data' action='' method='post'>
     <label>Income</label>
 
-    <input size='20' type='test' name='income' value='<?php if (isset($_POST['income']))print $_POST['income']; ?>'>
+    <input size='20' type='text' name='income' value='<?php if (isset($_POST['income']))print $_POST['income']; ?>'>
     <br>
     <label>Payout date</label>
 
-    <input size='20' type='test' name='date' value='<?php if (isset($_POST['date']))print $_POST['date']; ?>'>
+    <input size='20' type='text' name='date' value='<?php if (isset($_POST['date']))print $_POST['date']; ?>'>
     <br>
     <label>GPUs</label>
 
-    <input size='20' type='test' name='gpu' value='<?php if (isset($_POST['gpu']))print $_POST['gpu']; ?>'>
+    <input size='20' type='text' name='gpu' value='<?php if (isset($_POST['gpu']))print $_POST['gpu']; ?>'>
     <br>
 		
 <label>Upload Hive OS Stats CSV file Here</label>
