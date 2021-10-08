@@ -1,0 +1,15 @@
+{
+  "name": "vendor_name/hiveos-payout-spliter",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "ivanc",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "league/csv": "9.7.2"
+  }
+}
