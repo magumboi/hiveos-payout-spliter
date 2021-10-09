@@ -1,14 +1,45 @@
 <?php
 require 'vendor/autoload.php';
 use League\Csv\Reader;
-print $_POST['file'];
+use League\Csv\Statement;
+
+header('Content-Type: application/json; charset=utf-8');
+
 if (isset($_POST['file']) && isset($_POST['income'])) {
-    print 'a';
+    //The resource that we want to download.
+    $fileUrl = $_POST['file'];
+
+    $filesaveTo = 'stats.csv';
+
+    $fp = fopen($filesaveTo, 'w+');
+
+    if($fp === false){
+        throw new Exception('Could not open: ' . $filesaveTo);
+    }
+
+    $ch = curl_init($fileUrl);
+    curl_setopt($ch, CURLOPT_FILE, $fp);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_exec($ch);
+
+    if(curl_errno($ch)){
+        throw new Exception(curl_error($ch));
+    }
+
+    $getstatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    fclose($fp);
+    if($getstatusCode == 200){
+        //echo 'Downloaded!';
+        main($_POST['income']);
+    } else{
+        echo "Status Code: " . $getstatusCode;
+    }
 }
 
-function main($income,$file){
-    //$income = $_POST['income'];
-    $gpus = $_POST['gpu'];
+function main($income){
+
     $payday = date("d/m/Y");
 
     $payDayFormat = DateTime::createFromFormat('d/m/Y',$payday);
@@ -16,10 +47,7 @@ function main($income,$file){
     $payDayFormat->modify('-2 day');
     $contractDateBegin = date('Y-m-d', strtotime($payDayFormat->format('Y-m-d')));
 
-    /*$income= 0.00886247;
-    $gpus=5;
-    $payday = "08/10/2021";*/
-
+    $resultado = array();
     $prom = array();
     $sumavg = 0;
     $sum = 0;
@@ -27,8 +55,10 @@ function main($income,$file){
     $daycont = 0;
     $dead = 0;
     try {
-        $reader = Reader::createFromPath($file, 'r');
+        $reader = Reader::createFromPath('stats.csv', 'r');
         $reader->setHeaderOffset(0);
+        $records = Statement::create()->process($reader);
+        $gpus = substr_count(implode(" ",$records->getHeader()), "Unit");
         $recordcount = count($reader);
         $json = json_encode($reader);
         $obj = json_decode($json);
@@ -45,29 +75,29 @@ function main($income,$file){
                 }
             }
             if ($daycont != 0) {
-                print "Average Unit " . $j . " ethash H/s: " . $sum / $zerocont . ' H/s, Downtime: ' . gmdate("H:i:s", (60 * 5) * ($dead)) . '<br>';
                 $sumavg = $sumavg + ($sum / $zerocont);
                 array_push($prom, $sum / $zerocont);
             } else
-                print 'Not enough data<br>';
+                print 'Not enough data';
             $zerocont = 0;
             $sum = 0;
             $daycont = 0;
             $dead = 0;
         }
+        $resultado['gpuhs'] = $prom;
+        $resultado['income'] = $income;
+        $resultado['totalavg'] = $sumavg;
+        $resultado['start'] = $contractDateBegin;
+        $resultado['end'] = $contractDateEnd;
 
-        print '<br>Income: ' . $income . ' eth<br>';
-        print '<br>Total Avg: ' . $sumavg . ' H/s<br>';
-        print '<br>';
-
+        $ai = array();
         for ($i = 0; $i < count($prom); $i++) {
-            print "Unit " . ($i + 1) . " income in eth: " . ($income / $sumavg) * ($prom[$i]) . '<br>';
+            array_push($ai, ($income / $sumavg) * ($prom[$i]));
         }
+        $resultado['gpuIncome'] =  $ai;
 
-        print '<br>';
 
-        print '<br> Start date: ' . $contractDateBegin;
-        print '<br>End date: ' . $contractDateEnd;
+        print json_encode($resultado);
     } catch (Exception $e) {
         print $e;
     }

@@ -20,3 +20,5 @@ Homestead.json
 
 composer.phar
 composer.lock
+
+stats.csv
