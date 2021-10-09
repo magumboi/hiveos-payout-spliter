@@ -49,6 +49,7 @@ function main($income){
 
     $resultado = array();
     $prom = array();
+    $adead = array();
     $sumavg = 0;
     $sum = 0;
     $zerocont = 0;
@@ -77,6 +78,7 @@ function main($income){
             if ($daycont != 0) {
                 $sumavg = $sumavg + ($sum / $zerocont);
                 array_push($prom, $sum / $zerocont);
+                array_push($adead,gmdate("H:i:s", (60 * 5) * ($dead)));
             } else
                 print 'Not enough data';
             $zerocont = 0;
@@ -85,6 +87,7 @@ function main($income){
             $dead = 0;
         }
         $resultado['gpuhs'] = $prom;
+        $resultado['dead'] = $adead;
         $resultado['income'] = $income;
         $resultado['totalavg'] = $sumavg;
         $resultado['start'] = $contractDateBegin;
