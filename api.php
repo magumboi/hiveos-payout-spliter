@@ -1,4 +1,7 @@
 <?php
+/*ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);*/
 require 'vendor/autoload.php';
 use League\Csv\Reader;
 use League\Csv\Statement;
@@ -65,7 +68,10 @@ function main($income){
         $obj = json_decode($json);
         for ($j = 1; $j <= $gpus; $j++) {
             for ($i = 0; $i < $recordcount; $i++) {
-                $hashtime = DateTime::createFromFormat('d/m/Y H:i:s', $obj[$i]->{'time'});
+                if(substr_count($obj[$i]->{'time'}, ":") == 2)
+                    $hashtime = DateTime::createFromFormat('d/m/Y H:i:s', $obj[$i]->{'time'});
+                else
+                    $hashtime = DateTime::createFromFormat('d/m/Y H:i', $obj[$i]->{'time'});
                 if ((date('Y-m-d', strtotime($hashtime->format('Y-m-d'))) >= $contractDateBegin) && (date('Y-m-d', strtotime($hashtime->format('Y-m-d'))) < $contractDateEnd)) {
                     $daycont++;
                     $sum = $sum + $obj[$i]->{'Unit ' . $j . ' ethash H/s'};
@@ -99,9 +105,11 @@ function main($income){
         }
         $resultado['gpuIncome'] =  $ai;
 
-
+         $resultado['respuesta'] = true;
         print json_encode($resultado);
     } catch (Exception $e) {
-        print $e;
+        $resultado['respuesta'] = false;
+        $resultado['error'] = $e;
+        print json_encode($resultado);
     }
 }
