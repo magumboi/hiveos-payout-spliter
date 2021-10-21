@@ -83,8 +83,8 @@ function main($income){
             }
             if ($daycont != 0) {
                 $sumavg = $sumavg + ($sum / $zerocont);
-                array_push($prom, $sum / $zerocont);
-                array_push($adead,gmdate("H:i:s", (60 * 5) * ($dead)));
+                array_push($prom, $sum / $daycont);
+                array_push($adead,convert_seconds((60 * 5) * ($dead)));
             } else
                 print 'Not enough data';
             $zerocont = 0;
@@ -112,4 +112,9 @@ function main($income){
         $resultado['error'] = $e;
         print json_encode($resultado);
     }
+}
+
+function convert_seconds($seconds) {
+    $dt1 = new DateTime("@$seconds");
+    return $dt1->format('%a days, %h:%i:%s');
 }
