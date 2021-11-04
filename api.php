@@ -8,7 +8,7 @@ use League\Csv\Statement;
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (isset($_POST['file']) && isset($_POST['income'])) {
+if (isset($_POST['file']) && isset($_POST['income']) && isset($_POST['payday']) && isset($_POST['workedDays'])) {
     //The resource that we want to download.
     $fileUrl = $_POST['file'];
 
@@ -35,19 +35,19 @@ if (isset($_POST['file']) && isset($_POST['income'])) {
     fclose($fp);
     if($getstatusCode == 200){
         //echo 'Downloaded!';
-        main($_POST['income']);
+        main($_POST['income'],$_POST['payday'],$_POST['workedDays']);
     } else{
         echo "Status Code: " . $getstatusCode;
     }
 }
 
-function main($income){
+function main($income,$payday,$workedDays){
 
-    $payday = date("d/m/Y");
+    //$payday = date("d/m/Y");
 
     $payDayFormat = DateTime::createFromFormat('d/m/Y',$payday);
     $contractDateEnd = date('Y-m-d', strtotime($payDayFormat->format('Y-m-d')));
-    $payDayFormat->modify('-2 day');
+    $payDayFormat->modify('-'.$workedDays.' day');
     $contractDateBegin = date('Y-m-d', strtotime($payDayFormat->format('Y-m-d')));
 
     $resultado = array();
