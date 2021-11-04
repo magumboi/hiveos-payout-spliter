@@ -82,7 +82,7 @@ function main($income){
                 }
             }
             if ($daycont != 0) {
-                $sumavg = $sumavg + ($sum / $zerocont);
+                $sumavg = $sumavg + ($sum / $daycont);
                 array_push($prom, $sum / $daycont);
                 array_push($adead,convert_seconds((60 * 5) * ($dead)));
             } else
@@ -115,6 +115,7 @@ function main($income){
 }
 
 function convert_seconds($seconds) {
-    $dt1 = new DateTime("@$seconds");
-    return $dt1->format('%a days, %h:%i:%s');
+    $dtF = new \DateTime('@0');
+    $dtT = new \DateTime("@$seconds");
+    return $dtF->diff($dtT)->format('%a days, %h:%i:%s');
 }
