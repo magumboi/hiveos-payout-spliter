@@ -35,13 +35,13 @@ if (isset($_POST['file']) && isset($_POST['income']) && isset($_POST['payday']) 
     fclose($fp);
     if($getstatusCode == 200){
         //echo 'Downloaded!';
-        main($_POST['income'],$_POST['payday'],$_POST['workedDays']);
+        main($_POST['income'],$_POST['payday'],$_POST['workedDays'],$_POST['isOwner']);
     } else{
         echo "Status Code: " . $getstatusCode;
     }
 }
 
-function main($income,$payday,$workedDays){
+function main($income,$payday,$workedDays,$isOwner){
 
     //$payday = date("d/m/Y");
 
@@ -106,12 +106,32 @@ function main($income,$payday,$workedDays){
         $resultado['gpuIncome'] =  $ai;
 
          $resultado['respuesta'] = true;
+
+         if($isOwner){
+             saveToDB($resultado['income'],json_encode($resultado['gpuIncome']),count($ai),$resultado['start'],$resultado['end'],json_encode($resultado['gpuhs']));
+         }
+
         print json_encode($resultado);
     } catch (Exception $e) {
         $resultado['respuesta'] = false;
         $resultado['error'] = $e;
         print json_encode($resultado);
     }
+}
+function saveToDB($income,$gpuincome,$gpunum,$start,$payday,$gpuhr) {
+    // PDO Connection to MySQL
+    $pdo = new PDO('mysql:host=localhost;dbname=lamiel', 'root', 'lolazo34');
+    $data = [
+        'income' => $income,
+        'gpuincome' => $gpuincome,
+        'gpunum' => $gpunum,
+        'gpuhr' => $gpuhr,
+        'start' => $start,
+        'payday' => $payday
+    ];
+    $sql = "INSERT INTO historico (income, gpuincome, gpunum,gpuhr,start,payday) VALUES (:income, :gpuincome, :gpunum,:gpuhr,:start,:payday)";
+    $stmt= $pdo->prepare($sql);
+    $stmt->execute($data);
 }
 
 function convert_seconds($seconds) {
