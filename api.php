@@ -106,7 +106,7 @@ function main($income,$payday,$workedDays,$isOwner){
         $resultado['gpuIncome'] =  $ai;
 
          $resultado['respuesta'] = true;
-         
+
         /*
          if($isOwner){
              saveToDB($resultado['income'],json_encode($resultado['gpuIncome']),count($ai),$resultado['start'],$resultado['end'],json_encode($resultado['gpuhs']));
