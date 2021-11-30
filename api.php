@@ -8,7 +8,7 @@ use League\Csv\Statement;
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (isset($_POST['file']) && isset($_POST['income']) && isset($_POST['payday']) && isset($_POST['workedDays'])) {
+if (isset($_POST['income']) && isset($_POST['payday']) && isset($_POST['workedDays'])) {
     main($_POST['income'],$_POST['payday'],$_POST['workedDays'],$_POST['isOwner']);
     /* //The resource that we want to download.
      $fileUrl = $_POST['file'];
@@ -72,13 +72,13 @@ function main($income,$payday,$workedDays,$isOwner){
         $query = "SELECT * FROM `metrics` WHERE `server_time` BETWEEN '".$contractDateBegin." 00:00:00' AND '".$contractDateEnd." 23:55:00' ORDER BY `server_time`";
         $stmt = $pdo->prepare($query);
         $stmt->execute();
-        $rows = $stmt->fetch();
-        $rowCount = $stmt->rowCount();
+        $rows = $stmt->fetchAll();
+        //$rowCount = $stmt->rowCount();
         $gpus = count(explode(',',$rows[0]['ethash']));
 
-        for ($j = 1; $j <= $gpus; $j++) {
-            for ($i = 0; $i < $rowCount; $i++) {
-                $hashrates = explode(',',$rows[0]['ethash']);
+        for ($j = 0; $j < $gpus; $j++) {
+            foreach ($rows as $row) {
+                $hashrates = explode(',',$row['ethash']);
                 $gpuHr = $hashrates[$j];
                 $daycont++;
                 $sum = $sum + $gpuHr;
