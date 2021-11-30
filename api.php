@@ -3,42 +3,11 @@
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);*/
 require 'vendor/autoload.php';
-use League\Csv\Reader;
-use League\Csv\Statement;
 
 header('Content-Type: application/json; charset=utf-8');
 
 if (isset($_POST['income']) && isset($_POST['payday']) && isset($_POST['workedDays'])) {
     main($_POST['income'],$_POST['payday'],$_POST['workedDays'],$_POST['isOwner']);
-    /* //The resource that we want to download.
-     $fileUrl = $_POST['file'];
-
-     $filesaveTo = 'stats.csv';
- 
-     $fp = fopen($filesaveTo, 'w+');
-
-     if($fp === false){
-         throw new Exception('Could not open: ' . $filesaveTo);
-     }
-
-     $ch = curl_init($fileUrl);
-     curl_setopt($ch, CURLOPT_FILE, $fp);
-     curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-     curl_exec($ch);
-
-     if(curl_errno($ch)){
-         throw new Exception(curl_error($ch));
-     }
-
-     $getstatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-     curl_close($ch);
-     fclose($fp);
-     if($getstatusCode == 200){
-         //echo 'Downloaded!';
-     } else{
-         echo "Status Code: " . $getstatusCode;
-     }*/
 }
 
 function main($income,$payday,$workedDays,$isOwner){
@@ -57,14 +26,6 @@ function main($income,$payday,$workedDays,$isOwner){
     $daycont = 0;
     $dead = 0;
     try {
-        /*$reader = Reader::createFromPath('stats.csv', 'r');
-        $reader->setHeaderOffset(0);
-        $records = Statement::create()->process($reader);
-        $gpus = substr_count(implode(" ",$records->getHeader()), "Unit");
-        $recordcount = count($reader);
-        $json = json_encode($reader);
-        $obj = json_decode($json);*/
-
         $dsn = "mysql:host=localhost;dbname=hiveos";
         $user = "root";
         $passwd = "lolazo34";
