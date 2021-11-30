@@ -1,8 +1,11 @@
 <?php
-/*ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);*/
+error_reporting(E_ALL);
 require 'vendor/autoload.php';
+$GLOBALS['dsn'] = 'mysql:host=localhost;dbname=hiveos';
+$GLOBALS['usrdb'] = 'root';
+$GLOBALS['passwd'] = "lolazo34";
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -20,22 +23,24 @@ function main($income,$payday,$workedDays,$isOwner){
     $resultado = array();
     $prom = array();
     $adead = array();
+    $max = array();
     $sumavg = 0;
     $sum = 0;
     $zerocont = 0;
     $daycont = 0;
     $dead = 0;
     try {
-        $dsn = "mysql:host=localhost;dbname=hiveos";
-        $user = "root";
-        $passwd = "lolazo34";
-        $pdo = new PDO($dsn, $user, $passwd);
+        $pdo = new PDO($GLOBALS['dsn'], $GLOBALS['usrdb'], $GLOBALS['passwd']);
         $query = "SELECT * FROM `metrics` WHERE `server_time` BETWEEN '".$contractDateBegin." 00:00:00' AND '".$contractDateEnd." 23:55:00' ORDER BY `server_time`";
         $stmt = $pdo->prepare($query);
         $stmt->execute();
         $rows = $stmt->fetchAll();
         //$rowCount = $stmt->rowCount();
-        $gpus = count(explode(',',$rows[0]['ethash']));
+        //$gpus = count(explode(',',$rows[0]['ethash']));
+        foreach ($rows as $row)
+            array_push($max,$row['units']);
+
+        $gpus = max($max);
 
         for ($j = 0; $j < $gpus; $j++) {
             foreach ($rows as $row) {
@@ -64,7 +69,7 @@ function main($income,$payday,$workedDays,$isOwner){
         $resultado['dead'] = $adead;
         $resultado['income'] = $income;
         $resultado['totalavg'] = $sumavg;
-        $resultado['start'] = $contractDateBegin;
+        $resultado['start'] = DateTime::createFromFormat('Y-m-d',$contractDateBegin)->format('d/m/Y');
         $resultado['end'] = $payday;
 
         $ai = array();
@@ -75,11 +80,11 @@ function main($income,$payday,$workedDays,$isOwner){
 
         $resultado['respuesta'] = true;
 
-        /*
-         if($isOwner){
+
+         /*if($isOwner){
              saveToDB($resultado['income'],json_encode($resultado['gpuIncome']),count($ai),$resultado['start'],$resultado['end'],json_encode($resultado['gpuhs']));
-         }
-        */
+         }*/
+
 
         print json_encode($resultado);
     } catch (Exception $e) {
@@ -89,8 +94,9 @@ function main($income,$payday,$workedDays,$isOwner){
     }
 }
 function saveToDB($income,$gpuincome,$gpunum,$start,$payday,$gpuhr) {
+    try{
     // PDO Connection to MySQL
-    $pdo = new PDO('mysql:host=localhost;dbname=lamiel', 'root', 'lolazo34');
+    $pdo = new PDO($GLOBALS['dsn'], $GLOBALS['usrdb'], $GLOBALS['passwd']);
     $data = [
         'income' => $income,
         'gpuincome' => $gpuincome,
@@ -102,6 +108,10 @@ function saveToDB($income,$gpuincome,$gpunum,$start,$payday,$gpuhr) {
     $sql = "INSERT INTO historico (income, gpuincome, gpunum,gpuhr,start,payday) VALUES (:income, :gpuincome, :gpunum,:gpuhr,:start,:payday)";
     $stmt= $pdo->prepare($sql);
     $stmt->execute($data);
+    }
+    catch (Exception $e) {
+            print $e;
+        }
 }
 
 function convert_seconds($seconds) {
