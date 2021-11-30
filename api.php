@@ -104,7 +104,7 @@ function main($income,$payday,$workedDays,$isOwner){
         $resultado['income'] = $income;
         $resultado['totalavg'] = $sumavg;
         $resultado['start'] = $contractDateBegin;
-        $resultado['end'] = $contractDateEnd;
+        $resultado['end'] = $payday;
 
         $ai = array();
         for ($i = 0; $i < count($prom); $i++) {
