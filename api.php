@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 require 'vendor/autoload.php';
 $GLOBALS['dsn'] = 'mysql:host=localhost;dbname=hiveos';
-$GLOBALS['usrdb'] = 'root';
+$GLOBALS['usrdb'] = 'hiveos';
 $GLOBALS['passwd'] = "lolazo34";
 
 header('Content-Type: application/json; charset=utf-8');
@@ -81,9 +81,9 @@ function main($income,$payday,$workedDays,$isOwner){
         $resultado['respuesta'] = true;
 
 
-         /*if($isOwner){
-             saveToDB($resultado['income'],json_encode($resultado['gpuIncome']),count($ai),$resultado['start'],$resultado['end'],json_encode($resultado['gpuhs']));
-         }*/
+         if($isOwner){
+             saveToDB($resultado['income'],implode(',',$resultado['gpuIncome']),$gpus,DateTime::createFromFormat('d/m/Y',$resultado['start'])->format('Y-m-d'),DateTime::createFromFormat('d/m/Y',$resultado['end'])->format('Y-m-d'),implode(',',$resultado['gpuhs']));
+         }
 
 
         print json_encode($resultado);
@@ -98,16 +98,23 @@ function saveToDB($income,$gpuincome,$gpunum,$start,$payday,$gpuhr) {
     // PDO Connection to MySQL
     $pdo = new PDO($GLOBALS['dsn'], $GLOBALS['usrdb'], $GLOBALS['passwd']);
     $data = [
-        'income' => $income,
-        'gpuincome' => $gpuincome,
-        'gpunum' => $gpunum,
-        'gpuhr' => $gpuhr,
-        'start' => $start,
-        'payday' => $payday
+        ':income' => $income,
+        ':gpuincome' => $gpuincome,
+        ':gpunum' => $gpunum,
+        ':gpuhr' => $gpuhr,
+        ':start' => $start,
+        ':payday' => $payday
     ];
-    $sql = "INSERT INTO historico (income, gpuincome, gpunum,gpuhr,start,payday) VALUES (:income, :gpuincome, :gpunum,:gpuhr,:start,:payday)";
+    $sql = "INSERT INTO historico (income, gpuincome, gpunum,gpuhr,start,payday) VALUES (:income, :gpuincome, :gpunum,:gpuhr,:startt,:payday)";
+
     $stmt= $pdo->prepare($sql);
-    $stmt->execute($data);
+        $stmt->bindParam(':income', $income);
+        $stmt->bindParam(':gpuincome', $gpuincome);
+        $stmt->bindParam(':gpunum', $gpunum);
+        $stmt->bindParam(':gpuhr', $gpuhr);
+        $stmt->bindParam(':startt', $start);
+        $stmt->bindParam(':payday', $payday);
+    $stmt->execute();
     }
     catch (Exception $e) {
             print $e;
